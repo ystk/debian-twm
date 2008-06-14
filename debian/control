@@ -1,0 +1,20 @@
+Source: twm
+Section: x11
+Priority: optional
+Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
+Uploaders: David Nusinow <dnusinow@debian.org>, Julien Cristau <jcristau@debian.org>, Brice Goglin <bgoglin@debian.org>
+Build-Depends: debhelper (>= 5.0.0), pkg-config, libx11-dev (>= 2:1.0.0-2), libxext-dev (>= 1:1.0.0), libxt-dev (>= 1:1.0.0), libxmu-dev (>= 1:1.0.1), bison, flex, quilt
+Standards-Version: 3.7.3
+Vcs-Git: git://git.debian.org/git/pkg-xorg/app/twm
+Vcs-Browser: http://git.debian.org/?p=pkg-xorg/app/xdm.git
+
+Package: twm
+Architecture: any
+Pre-Depends: x11-common (>= 1:7.0.0)
+Depends: menu (>= 2.1.26), ${shlibs:Depends}, ${misc:Depends}
+Provides: x-window-manager
+Description: Tab window manager
+ twm is a window manager for the X Window System.  It provides title bars,
+ shaped windows, several forms of icon management, user-defined macro
+ functions, click-to-type and pointer-driven keyboard focus, and
+ user-specified key and pointer button bindings.

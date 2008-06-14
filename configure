@@ -3881,10 +3881,11 @@ pkg_failed=no
 { echo "$as_me:$LINENO: checking for TWM" >&5
 echo $ECHO_N "checking for TWM... $ECHO_C" >&6; }
 
-if test -n "$TWM_CFLAGS"; then
-    pkg_cv_TWM_CFLAGS="$TWM_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
+if test -n "$PKG_CONFIG"; then
+    if test -n "$TWM_CFLAGS"; then
+        pkg_cv_TWM_CFLAGS="$TWM_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
     { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"x11 xext xt xmu ice sm\"") >&5
   ($PKG_CONFIG --exists --print-errors "x11 xext xt xmu ice sm") 2>&5
   ac_status=$?
@@ -3894,13 +3895,15 @@ if test -n "$TWM_CFLAGS"; then
 else
   pkg_failed=yes
 fi
- else
-    pkg_failed=untried
+    fi
+else
+	pkg_failed=untried
 fi
-if test -n "$TWM_LIBS"; then
-    pkg_cv_TWM_LIBS="$TWM_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
+if test -n "$PKG_CONFIG"; then
+    if test -n "$TWM_LIBS"; then
+        pkg_cv_TWM_LIBS="$TWM_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
     { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"x11 xext xt xmu ice sm\"") >&5
   ($PKG_CONFIG --exists --print-errors "x11 xext xt xmu ice sm") 2>&5
   ac_status=$?
@@ -3910,8 +3913,9 @@ if test -n "$TWM_LIBS"; then
 else
   pkg_failed=yes
 fi
- else
-    pkg_failed=untried
+    fi
+else
+	pkg_failed=untried
 fi
 
 
@@ -3924,9 +3928,9 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        TWM_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "x11 xext xt xmu ice sm" 2>&1`
+	        TWM_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "x11 xext xt xmu ice sm"`
         else
-	        TWM_PKG_ERRORS=`$PKG_CONFIG --print-errors "x11 xext xt xmu ice sm" 2>&1`
+	        TWM_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "x11 xext xt xmu ice sm"`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$TWM_PKG_ERRORS" >&5

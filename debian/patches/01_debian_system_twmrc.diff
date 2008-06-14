@@ -1,0 +1,97 @@
+$Id: 903_debian_system.twmrc.diff 396 2005-07-22 21:45:02Z dnusinow $
+
+Fix system.twmrc to actually be useful and tabbed right, as well as add
+the Debian menu. This patch by Branden Robinson.
+
+Index: a/src/system.twmrc
+===================================================================
+--- a/src/system.twmrc.orig	2007-06-08 00:58:50.000000000 +0200
++++ b/src/system.twmrc	2007-06-08 00:59:31.000000000 +0200
+@@ -52,7 +52,8 @@
+ #
+ # Set some useful bindings.  Sort of uwm-ish, sort of simple-button-ish
+ #
+-Button1 = : root : f.menu "defops"
++Button1 = : root : f.menu "main"
++Button2 = : root : f.menu "windowops"
+ 
+ Button1 = m : window|icon : f.function "move-or-lower"
+ Button2 = m : window|icon : f.iconify
+@@ -70,25 +71,39 @@
+ #
+ # And a menus with the usual things
+ #
+-menu "defops"
++menu "main"
+ {
+-"Twm"	f.title
+-"Iconify"	f.iconify
+-"Resize"	f.resize
+-"Move"		f.move
+-"Raise"		f.raise
+-"Lower"		f.lower
+-""		f.nop
+-"Focus"		f.focus
+-"Unfocus"	f.unfocus
+-"Show Iconmgr"	f.showiconmgr
+-"Hide Iconmgr"	f.hideiconmgr
+-""		f.nop
+-"Xterm"		f.exec "exec xterm &"
+-""		f.nop
+-"Kill"		f.destroy
+-"Delete"	f.delete
+-""		f.nop
+-"Restart"	f.restart
+-"Exit"		f.quit
++		"Main Menu"		f.title
++		"Debian"		f.menu "/Debian"
++		""			f.nop
++		"Show Icon Manager"	f.showiconmgr
++		"Hide Icon Manager"	f.hideiconmgr
++		""			f.nop
++		"Exit"			f.menu "Quit-Verify"
+ }
++
++menu "Quit-Verify"
++{
++		"Really quit twm?"	f.title
++		"No, restart twm"	f.restart
++		"Yes, really quit"	f.quit
++}
++
++menu "windowops"
++{
++		"Window Ops"		f.title
++		""			f.nop
++		"Iconify"		f.iconify
++		"Resize"		f.resize
++		"Move"			f.move
++		"Raise"			f.raise
++		"Lower"			f.lower
++		""			f.nop
++		"Focus"			f.focus
++		"Unfocus"		f.unfocus
++		""			f.nop
++		"Delete"		f.delete
++		"Destroy"		f.destroy
++}
++
++include-menu-defs
+Index: a/src/Makefile.am
+===================================================================
+--- a/src/Makefile.am.orig	2007-06-08 00:59:37.000000000 +0200
++++ b/src/Makefile.am	2007-06-08 01:00:37.000000000 +0200
+@@ -24,11 +24,11 @@
+ 
+ bin_PROGRAMS = twm
+ 
+-rcdir = ${datadir}/X11/twm
++rcdir = ${sysconfdir}/X11/twm
+ dist_rc_DATA = system.twmrc
+ 
+ AM_CFLAGS = $(TWM_CFLAGS) -DXVENDORNAME=\"The\ X.Org\ Foundation\" -DXORG_RELEASE=\"Release\ $(VERSION)\" -D_BSD_SOURCE
+-AM_CFLAGS += -DSYSTEM_INIT_FILE=\"${datadir}/X11/twm/system.twmrc\"
++AM_CFLAGS += -DSYSTEM_INIT_FILE=\"$(rcdir)/system.twmrc\"
+ 
+ twm_LDADD = $(TWM_LIBS)
+ 

@@ -1,0 +1,4 @@
+etc/X11/twm/system.twmrc-menu
+usr/bin/twm
+usr/share/man/man1/twm.1
+usr/share/xsessions/twm.desktop

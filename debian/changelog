@@ -1,0 +1,94 @@
+twm (1:1.0.4-2) unstable; urgency=low
+
+  * Update patches to not require -p0 and pull newest xsfbs, closes: #485267.
+  * Add myself to Uploaders.
+
+ -- Brice Goglin <bgoglin@debian.org>  Sat, 14 Jun 2008 16:08:36 +0200
+
+twm (1:1.0.4-1) unstable; urgency=low
+
+  * New upstream release
+  * Fixup patch 01_debian_system_twmrc.diff
+  * Remove -1 debian revisions from build-deps to please lintian.
+  * Add Vcs-* control fields.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 08 Mar 2008 03:59:33 +0100
+
+twm (1:1.0.3-3) unstable; urgency=low
+
+  [ Julien Cristau ]
+  * debian/twm.menu-method: add a "supported" entry for the wm menu, to make
+    it possible to switch to another window manager from twm, closes: #409111.
+  * Menu transition: "WindowManagers" renamed to "Window Managers".
+  * Add myself to Uploaders.
+  * Bump Standards-Version to 3.7.3.
+
+  [ Brice Goglin ]
+  * Add a /usr/share/xsessions/twm.desktop (stolen from kdm's private
+    database) so that twm appears in the list of possible sessions in
+    all *dm that support it, thanks Christopher Martin, closes: #335071.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 12 Jan 2008 17:31:20 +0100
+
+twm (1:1.0.3-2) unstable; urgency=low
+
+  * Generate the maintainer scripts properly (so the x-window-manager
+    alternative is installed), and remove old transition code from
+    the XFree86 4.x days.
+
+ -- Julien Cristau <jcristau@debian.org>  Fri, 08 Jun 2007 14:35:30 +0200
+
+twm (1:1.0.3-1) unstable; urgency=low
+
+  [ Julien Cristau ]
+  * New upstream release.
+  * Install the manpage as twm.1 instead of twm.1x and update
+    update-alternatives parameters (closes: #396940).
+  * Use dh_install --list-missing.
+  * Make sure twm looks for system.twmrc in /etc/X11/twm, not
+    /usr/share/X11/twm.
+
+  [ Brice Goglin ]
+  * Drop useless -DLIBXCURSOR from debian/rules (closes: #384073).
+
+ -- Julien Cristau <jcristau@debian.org>  Fri, 08 Jun 2007 01:03:48 +0200
+
+twm (1:1.0.1-4) unstable; urgency=low
+
+  * Run dh_install menu so that we actually install the menu method. Thanks
+    giacomo boffi for the report and Bill Allombert for the fix.
+    (closes: #364255)
+  * Add a pre-depends on x11-common so the upgrade from X11R6 goes smoothly.
+    Thanks Vasilis Vasaitis. (closes: #365913)
+  * Add outputencoding="ASCII"; to the menu-method the facilitate translations
+    of menus. Thanks Bill Allombert.
+  * Add quilt to build-depends
+  * Bump standards version to 3.7.2.0
+  * Bump debhelper compat to version 5
+  * Point the menu method at /usr/bin/install-menu rather than /usr/sbin. Also
+    bump the version of menu we depend on to >= 2.1.26, which implements this
+    change
+
+ -- David Nusinow <dnusinow@debian.org>  Sun, 21 May 2006 19:14:42 -0400
+
+twm (1:1.0.1-3) unstable; urgency=low
+
+  * Upload to unstable
+
+ -- David Nusinow <dnusinow@debian.org>  Tue,  4 Apr 2006 18:44:37 -0400
+
+twm (1:1.0.1-2) experimental; urgency=low
+
+  [ David Nusinow ]
+  * Add versioned build-depends on the modular X libs. Thanks Frank
+    Lichtenheld. (closes: #354098)
+  * Port patches from trunk
+    + debian/903_debian_system.twmrc.diff
+
+ -- David Nusinow <dnusinow@debian.org>  Sun, 26 Feb 2006 22:55:58 -0500
+
+twm (1:1.0.1-1) experimental; urgency=low
+
+  * First modular upload to Debian
+
+ -- David Nusinow <dnusinow@debian.org>  Sun, 19 Feb 2006 19:58:38 -0500
