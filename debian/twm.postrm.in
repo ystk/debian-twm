@@ -5,8 +5,6 @@
 # /usr/share/common-licenses/GPL or <http://www.gnu.org/copyleft/gpl.txt>.
 # Acknowledgements to Stephen Early, Mark Eichin, and Manoj Srivastava.
 
-# $Id: twm.postrm.in 189 2005-06-11 00:04:27Z branden $
-
 set -e
 
 THIS_PACKAGE=twm

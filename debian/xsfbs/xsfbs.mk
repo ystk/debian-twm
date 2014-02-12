@@ -44,9 +44,9 @@ NO_EPOCH_VER:=$(shell echo $(UPSTREAM_VERSION) | sed 's/^.://')
 BUILDER:=$(shell echo $${DEBEMAIL:-$${EMAIL:-$$(echo $$LOGNAME@$$(cat /etc/mailname 2>/dev/null))}})
 
 # Find out if this is an official build; an official build has nothing but
-# digits, dots, and/or the strings "woody" or "sarge" in the Debian part of the
+# digits, dots, and/or the codename of a release in the Debian part of the
 # version number.  Anything else indicates an unofficial build.
-OFFICIAL_BUILD:=$(shell VERSION=$(SOURCE_VERSION); if ! expr "$$(echo $${VERSION\#\#*-} | sed 's/\(woody\|sarge\)//g')" : ".*[^0-9.].*" >/dev/null 2>&1; then echo yes; fi)
+OFFICIAL_BUILD:=$(shell VERSION=$(SOURCE_VERSION); if ! expr "$$(echo $${VERSION\#\#*-} | sed 's/\(woody\|sarge\|etch\|lenny\)//g')" : ".*[^0-9.].*" >/dev/null 2>&1; then echo yes; fi)
 
 # Set up parameters for the Debian build environment.
 
@@ -68,16 +68,6 @@ endif
 
 # $(STAMP_DIR) houses stamp files for complex targets.
 STAMP_DIR:=stampdir
-
-# $(SOURCE_DIR) houses one or more source trees.
-SOURCE_DIR:=build-tree
-
-# $(SOURCE_TREE) is the location of the source tree to be compiled.  If there
-# is more than one, others are found using this name plus a suffix to indicate
-# the purpose of the additional tree (e.g., $(SOURCE_TREE)-custom).  The
-# "setup" target is responsible for creating such trees.
-#SOURCE_TREE:=$(SOURCE_DIR)/xc
-#FIXME We need to define this in our debian/rules file
 
 # $(DEBTREEDIR) is where all install rules are told (via $(DESTDIR)) to place
 # their files.
@@ -119,11 +109,15 @@ $(STAMP_DIR)/stampdir:
 # Set up the package build directory as quilt expects to find it.
 .PHONY: prepare
 stampdir_targets+=prepare
-prepare: $(STAMP_DIR)/genscripts $(STAMP_DIR)/prepare $(STAMP_DIR)/log
-$(STAMP_DIR)/prepare: $(STAMP_DIR)/stampdir
-	if [ ! -e $(STAMP_DIR)/log ]; then \
-		mkdir $(STAMP_DIR)/log; \
-	fi; \
+prepare: $(STAMP_DIR)/prepare
+$(STAMP_DIR)/prepare: $(STAMP_DIR)/logdir $(STAMP_DIR)/genscripts
+	>$@
+
+.PHONY: logdir
+stampdir_targets+=logdir
+logdir: $(STAMP_DIR)/logdir
+$(STAMP_DIR)/logdir: $(STAMP_DIR)/stampdir
+	mkdir -p $(STAMP_DIR)/log
 	>$@
 
 # Apply all patches to the upstream source.
@@ -152,7 +146,7 @@ $(STAMP_DIR)/patch: $(STAMP_DIR)/prepare
 
 # Revert all patches to the upstream source.
 .PHONY: unpatch
-unpatch: $(STAMP_DIR)/prepare
+unpatch: $(STAMP_DIR)/logdir
 	rm -f $(STAMP_DIR)/patch
 	@echo -n "Unapplying patches..."; \
 	if $(QUILT) applied >/dev/null 2>/dev/null; then \
@@ -183,20 +177,8 @@ cleanscripts:
 xsfclean: cleanscripts unpatch
 	dh_testdir
 	rm -rf .pc
-	rm -rf $(STAMP_DIR) $(SOURCE_DIR)
-	rm -rf imports
-	dh_clean debian/shlibs.local \
-	         debian/po/pothead
-
-# Generate the debconf templates POT file header.
-debian/po/pothead: debian/po/pothead.in
-	sed -e 's/SOURCE_VERSION/$(SOURCE_VERSION)/' \
-	  -e 's/DATE/$(shell date "+%F %X%z"/)' <$< >$@
-
-# Update POT and PO files.
-.PHONY: updatepo
-updatepo: debian/po/pothead
-	debian/scripts/debconf-updatepo --pot-header=pothead --verbose
+	rm -rf $(STAMP_DIR)
+	dh_clean
 
 # Remove files from the upstream source tree that we don't need, or which have
 # licensing problems.  It must be run before creating the .orig.tar.gz.
@@ -259,7 +241,6 @@ $(STAMP_DIR)/genscripts: $(STAMP_DIR)/stampdir
 	      | sed -e '/^#INCLUDE_SHELL_LIB#$$/d' >>$$MAINTSCRIPT.tmp; \
 	    sed -e 's/@SOURCE_VERSION@/$(SOURCE_VERSION)/' \
 	        -e 's/@OFFICIAL_BUILD@/$(OFFICIAL_BUILD)/' \
-	        -e 's/@DEFAULT_DCRESOLUTIONS@/$(DEFAULT_DCRESOLUTIONS)/' \
 	      <$$MAINTSCRIPT.tmp >$$MAINTSCRIPT; \
 	    rm $$MAINTSCRIPT.tmp; \
 	  fi; \
@@ -272,29 +253,33 @@ $(STAMP_DIR)/genscripts: $(STAMP_DIR)/stampdir
 	#                                    debian/*.prerm
 	>$@
 
-# Generate the shlibs.local file.
-debian/shlibs.local:
-	cat debian/*.shlibs >$@
+# Compute dependencies for drivers
+#
+VIDEODEP = $(shell cat /usr/share/xserver-xorg/videodrvdep 2>/dev/null)
+INPUTDEP = $(shell cat /usr/share/xserver-xorg/xinputdep 2>/dev/null)
 
-SERVERMINVERS = $(shell cat /usr/share/xserver-xorg/serverminver 2>/dev/null)
+# these two can be removed post-squeeze
 VIDEOABI = $(shell cat /usr/share/xserver-xorg/videoabiver 2>/dev/null)
 INPUTABI = $(shell cat /usr/share/xserver-xorg/inputabiver 2>/dev/null)
-SERVER_DEPENDS = xserver-xorg-core (>= $(SERVERMINVERS))
-VIDDRIVER_PROVIDES = xserver-xorg-video-$(VIDEOABI)
-INPDRIVER_PROVIDES = xserver-xorg-input-$(INPUTABI)
+VIDDRIVER_PROVIDES = xserver-xorg-video-$(VIDEOABI), xorg-driver-video
+INPDRIVER_PROVIDES = xserver-xorg-input-$(INPUTABI), xorg-driver-input
+
 ifeq ($(PACKAGE),)
 PACKAGE=$(shell awk '/^Package:/ { print $$2; exit }' < debian/control)
 endif
 
 .PHONY: serverabi
 serverabi: install
-ifeq ($(SERVERMINVERS),)
-	@echo error: xserver-xorg-dev needs to be installed
+ifeq ($(VIDEODEP),)
+	@echo 'error: xserver-xorg-dev >= 1.7.6.901 needs to be installed'
 	@exit 1
 else
-	echo "xserver:Depends=$(SERVER_DEPENDS)" >> debian/$(PACKAGE).substvars
+	echo "xviddriver:Depends=$(VIDEODEP)" >> debian/$(PACKAGE).substvars
+	echo "xinpdriver:Depends=$(INPUTDEP)" >> debian/$(PACKAGE).substvars
+	# the following is there for compatibility...
 	echo "xviddriver:Provides=$(VIDDRIVER_PROVIDES)" >> debian/$(PACKAGE).substvars
 	echo "xinpdriver:Provides=$(INPDRIVER_PROVIDES)" >> debian/$(PACKAGE).substvars
+	echo "xserver:Depends=$(VIDEODEP), $(INPUTDEP)" >> debian/$(PACKAGE).substvars
 endif
 
 # vim:set noet ai sts=8 sw=8 tw=0:

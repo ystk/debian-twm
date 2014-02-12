@@ -13,13 +13,14 @@ PACKAGE = twm
 include debian/xsfbs/xsfbs.mk
 
 CFLAGS = -Wall -g
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
 else
 	CFLAGS += -O2
 endif
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
-	INSTALL_PROGRAM += -s
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	MAKEFLAGS += -j$(NUMJOBS)
 endif
 
 DEB_HOST_ARCH      ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
@@ -31,20 +32,22 @@ else
 	confflags += --build=$(DEB_BUILD_GNU_TYPE) --host=$(DEB_HOST_GNU_TYPE)
 endif
 
-confflags += --enable-man-pages=3
+build: build-arch build-indep
 
-build: genscripts patch build-stamp
-build-stamp:
+build-indep:
+
+build-arch: build-stamp
+build-stamp: $(STAMP_DIR)/prepare $(STAMP_DIR)/patch
 	dh_testdir
 
-	mkdir obj-$(DEB_BUILD_GNU_TYPE)
-	cd obj-$(DEB_BUILD_GNU_TYPE) && \
+	autoreconf -vfi
+	mkdir -p build
+	cd build && \
 	../configure --prefix=/usr --mandir=\$${prefix}/share/man \
 	             --infodir=\$${prefix}/share/info --sysconfdir=/etc \
 		     $(confflags) CFLAGS="$(CFLAGS)" 
-	cd obj-$(DEB_BUILD_GNU_TYPE) && $(MAKE)
-
-	touch build-stamp
+	cd build && $(MAKE)
+	>$@
 
 clean: xsfclean
 	dh_testdir
@@ -55,7 +58,10 @@ clean: xsfclean
 	rm -f */config.cache */config.log */config.status
 	rm -f conftest* */conftest*
 	rm -rf autom4te.cache */autom4te.cache
-	rm -rf obj-*
+	rm -rf build
+	rm -f aclocal.m4 compile config.guess config.sub config.h.in configure
+	rm -f depcomp install-sh missing mkinstalldirs ylwrap
+	find -name Makefile.in -delete
 
 	dh_clean
 
@@ -65,7 +71,7 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	cd obj-$(DEB_BUILD_GNU_TYPE) && $(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
+	cd build && $(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
 	install -d debian/tmp/etc/X11/twm
 	install -m 644 src/system.twmrc debian/tmp/etc/X11/twm/system.twmrc-menu
 	install -d debian/tmp/usr/share/xsessions
@@ -87,7 +93,6 @@ binary-arch: build install
 	dh_fixperms
 	dh_installdeb
 	dh_shlibdeps
-	dh_makeshlibs
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

@@ -17,6 +17,4 @@ will appear in /etc/X11/twm/system.twmrc and be used by the twm binary.
 Some examples of .twmrc files from days of yore are available in
 /usr/share/doc/twm/examples.
 
-$Id: twm.README.Debian 428 2005-07-28 04:30:44Z dnusinow $
-
 vim:set ai et sts=4 sw=4 tw=80:

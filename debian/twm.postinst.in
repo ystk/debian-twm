@@ -5,8 +5,6 @@
 # /usr/share/common-licenses/GPL or <http://www.gnu.org/copyleft/gpl.txt>.
 # Acknowledgements to Stephen Early, Mark Eichin, and Manoj Srivastava.
 
-# $Id: twm.postinst.in 189 2005-06-11 00:04:27Z branden $
-
 set -e
 
 THIS_PACKAGE=twm
@@ -15,9 +13,6 @@ THIS_SCRIPT=postinst
 #INCLUDE_SHELL_LIB#
 
 #DEBHELPER#
-
-# clean up after older alternative that used different path
-update-alternatives --remove x-window-manager /usr/bin/X11/twm
 
 update-alternatives --install /usr/bin/x-window-manager x-window-manager \
   /usr/bin/twm 40 --slave /usr/share/man/man1/x-window-manager.1.gz \

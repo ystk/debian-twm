@@ -1,7 +1,5 @@
 #!/usr/bin/install-menu
 
-# $Id: twm.menu-method 189 2005-06-11 00:04:27Z branden $
-
 #   -*- mode: shell-script; -*-
 #I need menu-1!
 #

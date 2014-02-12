@@ -1,5 +1,3 @@
-# $Id: twm.menu 189 2005-06-11 00:04:27Z branden $
-
 ?package(twm):\
   needs="wm"\
   section="Window Managers"\

@@ -1,3 +1,30 @@
+twm (1:1.0.6-1) unstable; urgency=low
+
+  * Kill obsolete svn $Id$ tags from packaging.
+  * postinst: drop obsolete cleanup for /usr/bin/X11/twm x-window-manager
+    alternative.
+  * Remove myself from Uploaders.
+  * Rename the build directory to not include DEB_BUILD_GNU_TYPE for no
+    good reason.  Thanks, Colin Watson!
+  * New upstream release.
+  * Update debian/copyright from COPYING.
+  * Various debian/rules updates:
+    - use $(filter) instead of $(findstring) to parse DEB_BUILD_OPTIONS
+    - enable parallel builds
+    - fix rules dependencies
+    - drop useless --enable-man-pages=3 configure flag
+  * Add build-arch and (empty) build-indep targets.
+  * Drop Pre-Depends on x11-common.
+  * Remove David Nusinow and Brice Goglin from Uploaders.  Thanks for your
+    work!
+  * Bump Standards-Version to 3.9.1.
+  * Run autoreconf at build time.  Delete generated files on clean.
+    Build-depend on xutils-dev and automake.
+  * Refresh 01_debian_system_twmrc.diff.
+  * Don't call dh_makeshlibs [lintian].
+
+ -- Julien Cristau <jcristau@debian.org>  Wed, 09 Feb 2011 17:42:27 +0100
+
 twm (1:1.0.4-2) unstable; urgency=low
 
   * Update patches to not require -p0 and pull newest xsfbs, closes: #485267.

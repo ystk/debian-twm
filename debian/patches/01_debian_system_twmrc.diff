@@ -1,13 +1,13 @@
-$Id: 903_debian_system.twmrc.diff 396 2005-07-22 21:45:02Z dnusinow $
+From: Branden Robinson <branden@debian.org>
 
 Fix system.twmrc to actually be useful and tabbed right, as well as add
-the Debian menu. This patch by Branden Robinson.
+the Debian menu.
 
-Index: a/src/system.twmrc
+Index: twm/src/system.twmrc
 ===================================================================
---- a/src/system.twmrc.orig	2007-06-08 00:58:50.000000000 +0200
-+++ b/src/system.twmrc	2007-06-08 00:59:31.000000000 +0200
-@@ -52,7 +52,8 @@
+--- twm.orig/src/system.twmrc
++++ twm/src/system.twmrc
+@@ -48,7 +48,8 @@ Function "move-or-iconify" { f.move f.de
  #
  # Set some useful bindings.  Sort of uwm-ish, sort of simple-button-ish
  #
@@ -17,7 +17,7 @@ Index: a/src/system.twmrc
  
  Button1 = m : window|icon : f.function "move-or-lower"
  Button2 = m : window|icon : f.iconify
-@@ -70,25 +71,39 @@
+@@ -66,25 +67,39 @@ Button2 = : iconmgr : f.iconify
  #
  # And a menus with the usual things
  #
@@ -77,11 +77,11 @@ Index: a/src/system.twmrc
 +}
 +
 +include-menu-defs
-Index: a/src/Makefile.am
+Index: twm/src/Makefile.am
 ===================================================================
---- a/src/Makefile.am.orig	2007-06-08 00:59:37.000000000 +0200
-+++ b/src/Makefile.am	2007-06-08 01:00:37.000000000 +0200
-@@ -24,11 +24,11 @@
+--- twm.orig/src/Makefile.am
++++ twm/src/Makefile.am
+@@ -24,11 +24,11 @@ AM_YFLAGS = -d
  
  bin_PROGRAMS = twm
  
