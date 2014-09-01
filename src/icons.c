@@ -1,5 +1,5 @@
 /*
- * 
+ *
 Copyright 1989, 1998  The Open Group
 
 Permission to use, copy, modify, distribute, and sell this software and its
@@ -58,7 +58,7 @@ splitEntry (IconEntry *ie, int grav1, int grav2, int w, int h)
 	if (w != ie->w)
 	    splitEntry (ie, grav2, grav1, w, ie->h);
 	if (h != ie->h) {
-	    new = (IconEntry *)malloc (sizeof (IconEntry));
+	    new = malloc (sizeof (IconEntry));
 	    new->twm_win = 0;
 	    new->used = 0;
 	    new->next = ie->next;
@@ -79,7 +79,7 @@ splitEntry (IconEntry *ie, int grav1, int grav2, int w, int h)
 	if (h != ie->h)
 	    splitEntry (ie, grav2, grav1, ie->w, h);
 	if (w != ie->w) {
-	    new = (IconEntry *)malloc (sizeof (IconEntry));
+	    new = malloc (sizeof (IconEntry));
 	    new->twm_win = 0;
 	    new->used = 0;
 	    new->next = ie->next;
@@ -98,13 +98,13 @@ splitEntry (IconEntry *ie, int grav1, int grav2, int w, int h)
     }
 }
 
-int
+static inline int
 roundUp (int v, int multiple)
 {
     return ((v + multiple - 1) / multiple) * multiple;
 }
 
-void
+static void
 PlaceIcon(TwmWindow *tmp_win, int def_x, int def_y, int *final_x, int *final_y)
 {
     IconRegion	*ir;
@@ -243,7 +243,7 @@ IconDown (TwmWindow *tmp_win)
 	    {
 	    	ip->next = ie->next;
 	    	mergeEntries (ie, ip);
-	    	free ((char *) ie);
+		free (ie);
 		ie = ip;
 	    	ip = prevIconEntry (ip, ir);
 	    } else if (in && in->used == 0 &&
@@ -252,7 +252,7 @@ IconDown (TwmWindow *tmp_win)
 	    {
 	    	ie->next = in->next;
 	    	mergeEntries (in, ie);
-	    	free ((char *) in);
+		free (in);
 	    	in = ie->next;
 	    } else
 		break;
@@ -266,7 +266,7 @@ AddIconRegion(char *geom, int grav1, int grav2, int stepx, int stepy)
     IconRegion *ir;
     int mask;
 
-    ir = (IconRegion *)malloc(sizeof(IconRegion));
+    ir = malloc(sizeof(IconRegion));
     ir->next = NULL;
     if (Scr->LastRegion)
 	Scr->LastRegion->next = ir;
@@ -292,7 +292,7 @@ AddIconRegion(char *geom, int grav1, int grav2, int stepx, int stepy)
 
     if (mask & YNegative)
 	ir->y += Scr->MyDisplayHeight - ir->h;
-    ir->entries = (IconEntry *)malloc(sizeof(IconEntry));
+    ir->entries = malloc(sizeof(IconEntry));
     ir->entries->next = 0;
     ir->entries->x = ir->x;
     ir->entries->y = ir->y;
@@ -311,12 +311,12 @@ FreeIconEntries (IconRegion *ir)
     for (ie = ir->entries; ie; ie=tmp)
     {
 	tmp = ie->next;
-	free ((char *) ie);
+	free (ie);
     }
 }
 
 void
-FreeIconRegions()
+FreeIconRegions(void)
 {
     IconRegion *ir, *tmp;
 
@@ -325,7 +325,7 @@ FreeIconRegions()
 	tmp = ir;
 	FreeIconEntries (ir);
 	ir = ir->next;
-	free((char *) tmp);
+	free(tmp);
     }
     Scr->FirstRegion = NULL;
     Scr->LastRegion = NULL;
@@ -348,7 +348,7 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
     tmp_win->forced = FALSE;
     tmp_win->icon_not_ours = FALSE;
 
-    /* now go through the steps to get an icon window,  if ForceIcon is 
+    /* now go through the steps to get an icon window,  if ForceIcon is
      * set, then no matter what else is defined, the bitmap from the
      * .twmrc file is used
      */
@@ -396,7 +396,7 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
     if (pm == None && tmp_win->wmhints &&
 	tmp_win->wmhints->flags & IconPixmapHint)
     {
-    
+
 	XGetGeometry(dpy,   tmp_win->wmhints->icon_pixmap,
              &JunkRoot, &JunkX, &JunkY,
 	     (unsigned int *)&tmp_win->icon_width, (unsigned int *)&tmp_win->icon_height, &JunkBW, &JunkDepth);
@@ -409,7 +409,7 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 	    0,0, tmp_win->icon_width, tmp_win->icon_height, 0, 0, 1 );
     }
 
-    /* if we still haven't got an icon, let's look in the Icon list 
+    /* if we still haven't got an icon, let's look in the Icon list
      * if ForceIcon is not set
      */
     if (pm == None && !Scr->ForceIcon)
@@ -548,7 +548,7 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 					    &attributes);
     }
 
-    /* I need to figure out where to put the icon window now, because 
+    /* I need to figure out where to put the icon window now, because
      * getting here means that I am going to make the icon visible
      */
     if (tmp_win->wmhints &&
