@@ -1,3 +1,13 @@
+twm (1:1.0.8-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Fix Vcs-Browser control field (closes: #736408).  Thanks, Mateusz Łukasik!
+  * Rewrite debian/rules using dh, bump compat to 9, drop xsfbs.
+  * Update 01_debian_system_twmrc.diff.
+  * Disable silent build rules.
+
+ -- Julien Cristau <jcristau@debian.org>  Sun, 13 Jul 2014 11:13:12 +0200
+
 twm (1:1.0.6-1) unstable; urgency=low
 
   * Kill obsolete svn $Id$ tags from packaging.

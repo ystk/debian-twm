@@ -7,11 +7,6 @@
 
 set -e
 
-THIS_PACKAGE=twm
-THIS_SCRIPT=postinst
-
-#INCLUDE_SHELL_LIB#
-
 #DEBHELPER#
 
 update-alternatives --install /usr/bin/x-window-manager x-window-manager \

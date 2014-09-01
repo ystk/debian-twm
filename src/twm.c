@@ -86,6 +86,8 @@ in this Software without prior written authorization from The Open Group.
 #include <X11/extensions/Print.h>
 #endif /* XPRINT */
 
+static void InitVariables ( void );
+
 XtAppContext appContext;	/* Xt application context */
 XtSignalId si;
 
@@ -103,14 +105,14 @@ ScreenInfo **ScreenList;	/* structures for each screen */
 ScreenInfo *Scr = NULL;		/* the cur and prev screens */
 int PreviousScreen;		/* last screen that we were on */
 int FirstScreen;		/* TRUE ==> first screen of display */
-Bool PrintErrorMessages = False;	/* controls error messages */
+static Bool PrintErrorMessages = False;	/* controls error messages */
 static int RedirectError;	/* TRUE ==> another window manager running */
 static int TwmErrorHandler ( Display *dpy, XErrorEvent *event );	/* for settting RedirectError */
 static int CatchRedirectError ( Display *dpy, XErrorEvent *event );	/* for everything else */
-static SIGNAL_T sigHandler(int);
+static void sigHandler(int);
 char Info[INFO_LINES][INFO_SIZE];		/* info strings to print */
 int InfoLines;
-char *InitFile = NULL;
+static char *InitFile = NULL;
 
 Cursor UpperLeftCursor;		/* upper Left corner cursor */
 Cursor RightButt;
@@ -127,7 +129,7 @@ XClassHint NoClass;		/* for applications with no class */
 
 XGCValues Gcv;
 
-char *Home;			/* the HOME environment variable */
+const char *Home;		/* the HOME environment variable */
 int HomeLen;			/* length of Home */
 int ParseError;			/* error parsing the .twmrc file */
 
@@ -145,7 +147,7 @@ char **Argv;
 
 Bool RestartPreviousState = False;	/* try to restart in previous state */
 
-unsigned long black, white;
+static unsigned long black, white;
 
 Atom TwmAtoms[11];
 
@@ -199,7 +201,7 @@ Bool IsPrintScreen(Screen *s)
                 return True;
             }
         }
-        XFree(pscreens);                      
+        XFree(pscreens);
     }
     return False;
 }
@@ -293,7 +295,7 @@ main(int argc, char *argv[])
 #define newhandler(sig) \
     if (signal (sig, SIG_IGN) != SIG_IGN) (void) signal (sig, sigHandler)
 
-    
+
     newhandler (SIGINT);
     newhandler (SIGHUP);
     newhandler (SIGQUIT);
@@ -327,7 +329,7 @@ main(int argc, char *argv[])
     appContext = XtCreateApplicationContext ();
 
     si = XtAppAddSignal(appContext, Done, NULL);
-    
+
     if (!(dpy = XtOpenDisplay (appContext, display_name, "twm", "twm",
 	NULL, 0, &zero, NULL))) {
 	fprintf (stderr, "%s:  unable to open display \"%s\"\n",
@@ -336,7 +338,7 @@ main(int argc, char *argv[])
     }
 
     if (fcntl(ConnectionNumber(dpy), F_SETFD, 1) == -1) {
-	fprintf (stderr, 
+	fprintf (stderr,
 		 "%s:  unable to mark display connection as close-on-exec\n",
 		 ProgramName);
 	exit (1);
@@ -373,7 +375,7 @@ main(int argc, char *argv[])
     InfoLines = 0;
 
     /* for simplicity, always allocate NumScreens ScreenInfo struct pointers */
-    ScreenList = (ScreenInfo **) calloc (NumScreens, sizeof (ScreenInfo *));
+    ScreenList = calloc (NumScreens, sizeof (ScreenInfo *));
     if (ScreenList == NULL)
     {
 	fprintf (stderr, "%s: Unable to allocate memory for screen list, exiting.\n",
@@ -402,7 +404,7 @@ main(int argc, char *argv[])
 	RedirectError = FALSE;
 	XSetErrorHandler(CatchRedirectError);
 	XSelectInput(dpy, RootWindow (dpy, scrnum),
-	    ColormapChangeMask | EnterWindowMask | PropertyChangeMask | 
+	    ColormapChangeMask | EnterWindowMask | PropertyChangeMask |
 	    SubstructureRedirectMask | KeyPressMask |
 	    ButtonPressMask | ButtonReleaseMask);
 	XSync(dpy, 0);
@@ -422,8 +424,7 @@ main(int argc, char *argv[])
 	numManaged ++;
 
 	/* Note:  ScreenInfo struct is calloc'ed to initialize to zero. */
-	Scr = ScreenList[scrnum] = 
-	    (ScreenInfo *) calloc(1, sizeof(ScreenInfo));
+	Scr = ScreenList[scrnum] = calloc(1, sizeof(ScreenInfo));
   	if (Scr == NULL)
   	{
   	    fprintf (stderr, "%s: unable to allocate memory for ScreenInfo structure for screen %d.\n",
@@ -471,8 +472,7 @@ main(int argc, char *argv[])
 	XSaveContext (dpy, Scr->Root, ScreenContext, (caddr_t) Scr);
 
 	Scr->TwmRoot.cmaps.number_cwins = 1;
-	Scr->TwmRoot.cmaps.cwins =
-		(ColormapWindow **) malloc(sizeof(ColormapWindow *));
+	Scr->TwmRoot.cmaps.cwins = malloc(sizeof(ColormapWindow *));
 	Scr->TwmRoot.cmaps.cwins[0] =
 		CreateColormapWindow(Scr->Root, True, False);
 	Scr->TwmRoot.cmaps.cwins[0]->visibility = VisibilityPartiallyObscured;
@@ -483,7 +483,7 @@ main(int argc, char *argv[])
 	Scr->cmapInfo.root_pushes = 0;
 	InstallWindowColormaps(0, &Scr->TwmRoot);
 
-	Scr->StdCmapInfo.head = Scr->StdCmapInfo.tail = 
+	Scr->StdCmapInfo.head = Scr->StdCmapInfo.tail =
 	  Scr->StdCmapInfo.mru = NULL;
 	Scr->StdCmapInfo.mruindex = 0;
 	LocateStandardColormaps();
@@ -504,7 +504,7 @@ main(int argc, char *argv[])
 
 	if (DisplayCells(dpy, scrnum) < 3)
 	    Scr->Monochrome = MONOCHROME;
- 	else if (DefaultVisual(dpy, scrnum)->class == GrayScale) 
+	else if (DefaultVisual(dpy, scrnum)->class == GrayScale)
  	    Scr->Monochrome = GRAYSCALE;
 	else
 	    Scr->Monochrome = COLOR;
@@ -600,7 +600,7 @@ main(int argc, char *argv[])
 			    }
 			}
 		    }
-		    XFree ((char *) wmhintsp);
+		    XFree (wmhintsp);
 		}
 	    }
 	}
@@ -628,16 +628,16 @@ main(int argc, char *argv[])
 	    }
 	}
 
-	
+
 	attributes.border_pixel = Scr->DefaultC.fore;
 	attributes.background_pixel = Scr->DefaultC.back;
 	attributes.event_mask = (ExposureMask | ButtonPressMask |
 				 KeyPressMask | ButtonReleaseMask);
 	attributes.backing_store = NotUseful;
 	attributes.cursor = XCreateFontCursor (dpy, XC_hand2);
-	valuemask = (CWBorderPixel | CWBackPixel | CWEventMask | 
+	valuemask = (CWBorderPixel | CWBackPixel | CWEventMask |
 		     CWBackingStore | CWCursor);
-	Scr->InfoWindow = XCreateWindow (dpy, Scr->Root, 0, 0, 
+	Scr->InfoWindow = XCreateWindow (dpy, Scr->Root, 0, 0,
 					 (unsigned int) 5, (unsigned int) 5,
 					 (unsigned int) BW, 0,
 					 (unsigned int) CopyFromParent,
@@ -648,7 +648,7 @@ main(int argc, char *argv[])
 					   " 8888 x 8888 ", 13);
 	valuemask = (CWBorderPixel | CWBackPixel | CWBitGravity);
 	attributes.bit_gravity = NorthWestGravity;
-	Scr->SizeWindow = XCreateWindow (dpy, Scr->Root, 0, 0, 
+	Scr->SizeWindow = XCreateWindow (dpy, Scr->Root, 0, 0,
 					 (unsigned int) Scr->SizeStringWidth,
 					 (unsigned int) (Scr->SizeFont.height +
 							 SIZE_VINDENT*2),
@@ -682,8 +682,8 @@ main(int argc, char *argv[])
 /**
  * initialize twm variables
  */
-void
-InitVariables()
+static void
+InitVariables(void)
 {
     FreeList(&Scr->BorderColorL);
     FreeList(&Scr->IconBorderColorL);
@@ -832,7 +832,7 @@ InitVariables()
 }
 
 void
-CreateFonts ()
+CreateFonts (void)
 {
     GetFont(&Scr->TitleBarFont);
     GetFont(&Scr->MenuFont);
@@ -850,7 +850,7 @@ RestoreWithdrawnLocation (TwmWindow *tmp)
     unsigned int bw, mask;
     XWindowChanges xwc;
 
-    if (XGetGeometry (dpy, tmp->w, &JunkRoot, &xwc.x, &xwc.y, 
+    if (XGetGeometry (dpy, tmp->w, &JunkRoot, &xwc.x, &xwc.y,
 		      &JunkWidth, &JunkHeight, &bw, &JunkDepth)) {
 
 	GetGravityOffsets (tmp, &gravx, &gravy);
@@ -891,7 +891,7 @@ RestoreWithdrawnLocation (TwmWindow *tmp)
 }
 
 
-void 
+void
 Reborder (Time time)
 {
     TwmWindow *tmp;			/* temp twm window structure */
@@ -917,11 +917,10 @@ Reborder (Time time)
     SetFocus ((TwmWindow*)NULL, time);
 }
 
-static SIGNAL_T 
+static void
 sigHandler(int sig)
 {
     XtNoticeSignal(si);
-    SIGNAL_RETURN;
 }
 
 /**
@@ -930,7 +929,7 @@ sigHandler(int sig)
 void
 Done(XtPointer client_data, XtSignalId *si)
 {
-    if (dpy) 
+    if (dpy)
     {
 	Reborder(CurrentTime);
 	XCloseDisplay(dpy);
@@ -948,7 +947,7 @@ Done(XtPointer client_data, XtSignalId *si)
 Bool ErrorOccurred = False;
 XErrorEvent LastErrorEvent;
 
-static int 
+static int
 TwmErrorHandler(Display *dpy, XErrorEvent *event)
 {
     LastErrorEvent = *event;
@@ -963,7 +962,7 @@ TwmErrorHandler(Display *dpy, XErrorEvent *event)
 }
 
 
-static int 
+static int
 CatchRedirectError(Display *dpy, XErrorEvent *event)
 {
     RedirectError = TRUE;

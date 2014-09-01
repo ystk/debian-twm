@@ -1,5 +1,5 @@
 #!/bin/sh
-# Debian twm package post-removal script
+# Debian twm package pre-removal script
 # Copyright 1998-2001, 2004 Branden Robinson.
 # Licensed under the GNU General Public License, version 2.  See the file
 # /usr/share/common-licenses/GPL or <http://www.gnu.org/copyleft/gpl.txt>.
@@ -7,17 +7,10 @@
 
 set -e
 
-THIS_PACKAGE=twm
-THIS_SCRIPT=postrm
-
-#INCLUDE_SHELL_LIB#
-
 #DEBHELPER#
 
-if [ "$1" = "purge" ]; then
-  if [ -d /etc/X11/twm ]; then
-    rm -r /etc/X11/twm
-  fi
+if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
+  update-alternatives --remove x-window-manager /usr/bin/twm
 fi
 
 exit 0

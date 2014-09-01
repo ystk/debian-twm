@@ -81,7 +81,7 @@ Index: twm/src/Makefile.am
 ===================================================================
 --- twm.orig/src/Makefile.am
 +++ twm/src/Makefile.am
-@@ -24,11 +24,11 @@ AM_YFLAGS = -d
+@@ -24,13 +24,13 @@ AM_YFLAGS = -d
  
  bin_PROGRAMS = twm
  
@@ -89,9 +89,11 @@ Index: twm/src/Makefile.am
 +rcdir = ${sysconfdir}/X11/twm
  dist_rc_DATA = system.twmrc
  
- AM_CFLAGS = $(TWM_CFLAGS) -DXVENDORNAME=\"The\ X.Org\ Foundation\" -DXORG_RELEASE=\"Release\ $(VERSION)\" -D_BSD_SOURCE
--AM_CFLAGS += -DSYSTEM_INIT_FILE=\"${datadir}/X11/twm/system.twmrc\"
-+AM_CFLAGS += -DSYSTEM_INIT_FILE=\"$(rcdir)/system.twmrc\"
+ AM_CPPFLAGS =							\
+ 	-DXVENDORNAME=\"The\ X.Org\ Foundation\"		\
+ 	-DXORG_RELEASE=\"Release\ $(VERSION)\"			\
+-	-DSYSTEM_INIT_FILE=\"${datadir}/X11/twm/system.twmrc\"
++	-DSYSTEM_INIT_FILE=\"$(rcdir)/system.twmrc\"
  
+ AM_CFLAGS = $(TWM_CFLAGS)
  twm_LDADD = $(TWM_LIBS)
- 

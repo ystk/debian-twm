@@ -3,7 +3,8 @@ Section: x11
 Priority: optional
 Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
 Build-Depends:
- debhelper (>= 5.0.0),
+ debhelper (>= 9),
+ dh-autoreconf,
  pkg-config,
  libx11-dev (>= 2:1.0.0-2),
  libxext-dev (>= 1:1.0.0),
@@ -16,7 +17,7 @@ Build-Depends:
  automake,
 Standards-Version: 3.9.1
 Vcs-Git: git://git.debian.org/git/pkg-xorg/app/twm
-Vcs-Browser: http://git.debian.org/?p=pkg-xorg/app/xdm.git
+Vcs-Browser: http://git.debian.org/?p=pkg-xorg/app/twm.git
 
 Package: twm
 Architecture: any

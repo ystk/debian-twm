@@ -1,5 +1,5 @@
 /*
- * 
+ *
 Copyright 1989, 1998  The Open Group
 
 Permission to use, copy, modify, distribute, and sell this software and its
@@ -79,12 +79,10 @@ extern WList *AddIconManager ( TwmWindow *tmp_win );
 extern IconMgr *AllocateIconManager ( char *name, char *icon_name, char *geom, int columns );
 extern void CreateIconManagers ( void );
 extern void DrawIconManagerBorder ( WList *tmp );
-extern void InsertInIconManager ( IconMgr *ip, WList *tmp, TwmWindow *tmp_win );
 extern void JumpIconManager ( int dir );
 extern void MoveIconManager ( int dir );
 extern void NotActiveIconManager ( WList *active );
 extern void PackIconManager ( IconMgr *ip );
-extern void RemoveFromIconManager ( IconMgr *ip, WList *tmp );
 extern void RemoveIconManager ( TwmWindow *tmp_win );
 extern void SortIconManager ( IconMgr *ip );
 

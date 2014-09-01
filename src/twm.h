@@ -62,6 +62,10 @@ from The Open Group.
 #ifndef _TWM_
 #define _TWM_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/cursorfont.h>
@@ -76,15 +80,7 @@ from The Open Group.
 
 #define PIXEL_ALREADY_TYPEDEFED		/* for Xmu/Drawing.h */
 
-#ifdef SIGNALRETURNSINT
-#define SIGNAL_T int
-#define SIGNAL_RETURN return 0
-#else
-#define SIGNAL_T void
-#define SIGNAL_RETURN return
-#endif
-
-typedef SIGNAL_T (*SigProc)(int); /* type of function returned by signal() */
+typedef void (*SigProc)(int);	/* type of function returned by signal() */
 
 #define BW 2			/* border width */
 #define BW2 4			/* border width  * 2 */
@@ -143,7 +139,7 @@ typedef SIGNAL_T (*SigProc)(int); /* type of function returned by signal() */
 
 typedef struct MyFont
 {
-    char *name;			/* name of the font */
+    const char *name;		/* name of the font */
     XFontStruct *font;		/* font structure */
     XFontSet fontset;		/* fontset structure */
     int height;			/* height of the font */
@@ -159,13 +155,13 @@ typedef struct ColorPair
 
 typedef struct _TitleButton {
     struct _TitleButton *next;		/* next link in chain */
-    char *name;				/* bitmap name in case of deferal */
+    const char *name;			/* bitmap name in case of deferal */
     Pixmap bitmap;			/* image to display in button */
     int srcx, srcy;			/* from where to start copying */
     unsigned int width, height;		/* size of pixmap */
     int dstx, dsty;			/* to where to start copying */
     int func;				/* function to execute */
-    char *action;			/* optional action arg */
+    const char *action;			/* optional action arg */
     struct MenuRoot *menuroot;		/* menu to pop on F_MENU */
     Bool rightside;			/* t: on right, f: on left */
 } TitleButton;
@@ -189,7 +185,7 @@ typedef struct _SqueezeInfo {
  * ICCCM property.
  */
 typedef struct TwmColormap
-{	
+{
     Colormap c;			/* Colormap id */
     int state;			/* install(ability) state */
     unsigned long install_req;	/* request number which installed it */
@@ -220,7 +216,7 @@ typedef struct Colormaps
 				       ((cm)->number_cwins - 1) / 2)
 
 /* for each window that is on the display, one of these structures
- * is allocated and linked into a list 
+ * is allocated and linked into a list
  */
 typedef struct TwmWindow
 {
@@ -345,11 +341,10 @@ typedef struct TWMWinConfigEntry
 
 #include <X11/Xosdefs.h>
 #include <stdlib.h>
-extern void InitVariables ( void );
 extern void CreateFonts ( void );
 extern void RestoreWithdrawnLocation ( TwmWindow *tmp );
 extern void Reborder( Time time);
-extern void Done( XtPointer, XtSignalId * );
+extern void Done( XtPointer, XtSignalId * ) _X_NORETURN;
 extern void ComputeCommonTitleOffsets ( void );
 extern void ComputeTitleLocation ( TwmWindow *tmp );
 extern void ComputeWindowTitleOffsets ( TwmWindow *tmp_win, int width, Bool squeeze );
@@ -375,7 +370,7 @@ extern XContext IconManagerContext;
 extern XContext ScreenContext;
 extern XContext ColormapContext;
 
-extern char *Home;
+extern const char *Home;
 extern int HomeLen;
 extern int ParseError;
 
@@ -391,7 +386,7 @@ extern int InfoLines;
 extern char Info[][INFO_SIZE];
 extern int Argc;
 extern char **Argv;
-extern void NewFontCursor ( Cursor *cp, char *str );
+extern void NewFontCursor ( Cursor *cp, const char *str );
 extern void NewBitmapCursor ( Cursor *cp, char *source, char *mask );
 extern Pixmap CreateMenuIcon ( int height, unsigned int *widthp, unsigned int *heightp );
 
@@ -406,10 +401,7 @@ extern Bool GetWMState ( Window w, int *statep, Window *iwp );
 extern void twmrc_error_prefix ( void );
 
 extern int yyparse ( void );
-extern int yylex ( void ); 
-extern void yyerror ( char *s );
-extern int doinput ( char *buf, int size );
-extern void RemoveDQuote ( char *str );
+extern int yylex ( void );
 
 extern Atom TwmAtoms[];
 

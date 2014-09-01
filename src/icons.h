@@ -1,5 +1,5 @@
 /*
- * 
+ *
 Copyright 1989, 1998  The Open Group
 
 Permission to use, copy, modify, distribute, and sell this software and its
@@ -51,12 +51,9 @@ typedef struct IconEntry
     short 		used;
 }IconEntry;
 
-extern int roundUp ( int v, int multiple );
-extern void PlaceIcon ( TwmWindow *tmp_win, int def_x, int def_y, 
-		       int *final_x, int *final_y );
 extern void IconUp ( TwmWindow *tmp_win );
 extern void IconDown ( TwmWindow *tmp_win );
-extern void AddIconRegion ( char *geom, int grav1, int grav2, 
+extern void AddIconRegion ( char *geom, int grav1, int grav2,
 			   int stepx, int stepy );
 extern void CreateIconWindow ( TwmWindow *tmp_win, int def_x, int def_y );
 
